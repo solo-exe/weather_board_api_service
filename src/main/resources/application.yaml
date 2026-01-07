@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: weather-board-api-service
+
+  config:
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+
+server:
+  # Reference variables from .env or OS using ${NAME:DEFAULT}
+  port: ${PORT:8080}
