@@ -9,6 +9,11 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
 
+openweathermap:
+  api:
+    base-url: ${OPENWEATHERMAP_BASE_URL}
+    apikey: ${OPENWEATHERMAP_API_KEY}
+
 server:
   # Reference variables from .env or OS using ${NAME:DEFAULT}
   port: ${PORT:8080}
