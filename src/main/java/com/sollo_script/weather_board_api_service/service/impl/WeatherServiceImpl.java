@@ -14,6 +14,7 @@ import com.sollo_script.weather_board_api_service.dto.AirPollutionResponse;
 import com.sollo_script.weather_board_api_service.dto.GeocodeResponse;
 import com.sollo_script.weather_board_api_service.dto.OpenWeatherResponse;
 import com.sollo_script.weather_board_api_service.entity.DailyLog;
+import com.sollo_script.weather_board_api_service.exception.error.TooManyRequestsException;
 import com.sollo_script.weather_board_api_service.repository.DailyLogRepository;
 import com.sollo_script.weather_board_api_service.service.WeatherService;
 
@@ -55,10 +56,10 @@ public class WeatherServiceImpl implements WeatherService {
         var currentLog = this.fetchDayLog();
         var currentCount = currentLog.getCallCount();
 
-        if (!apiKey.isPresent()) {
+        if (!apiKey.isPresent() || apiKey.get().equals(internalApiKey)) {
             // Limit to 900 calls per day as requested
             if (currentCount >= 900) {
-                throw new RuntimeException("API call limit exceeded");
+                throw new TooManyRequestsException("Daily API limit exceeded");
             }
         }
 

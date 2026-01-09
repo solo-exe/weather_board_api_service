@@ -9,6 +9,14 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
 
+  jpa:
+    hibernate:
+      ddl-auto: update
+    # show-sql: true
+    # properties:
+    #   hibernate:
+    #     format_sql: true
+
 openweathermap:
   api:
     base-url: ${OPENWEATHERMAP_BASE_URL}
@@ -17,3 +25,6 @@ openweathermap:
 server:
   # Reference variables from .env or OS using ${NAME:DEFAULT}
   port: ${PORT:8080}
+  # Global prefix for ALL routes in the application
+  servlet:
+    context-path: /api/v1
