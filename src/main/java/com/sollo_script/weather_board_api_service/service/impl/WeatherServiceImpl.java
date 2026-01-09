@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,9 @@ public class WeatherServiceImpl implements WeatherService {
 
     public WeatherServiceImpl(
             DailyLogRepository apiLogRepository,
-            RestClient restClient) {
+            @Qualifier("openWeatherMap") RestClient openWeatherClient) {
         this.dailyLogRepository = apiLogRepository;
-        this.restClient = restClient;
+        this.restClient = openWeatherClient;
     }
 
     private DailyLog fetchDayLog() {
