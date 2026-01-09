@@ -54,9 +54,11 @@ public class WeatherServiceImpl implements WeatherService {
         var currentLog = this.fetchDayLog();
         var currentCount = currentLog.getCallCount();
 
-        // Limit to 900 calls per day as requested
-        if (currentCount >= 900) {
-            throw new RuntimeException("API call limit exceeded");
+        if (!apiKey.isPresent()) {
+            // Limit to 900 calls per day as requested
+            if (currentCount >= 900) {
+                throw new RuntimeException("API call limit exceeded");
+            }
         }
 
         // Synchronous call to external API
@@ -67,7 +69,7 @@ public class WeatherServiceImpl implements WeatherService {
                         .queryParam("lon", lon)
                         .queryParam("units", "imperial")
                         .queryParam("exclude", "minutely,alerts")
-                        .queryParam("appid", internalApiKey)
+                        .queryParam("appid", apiKey.orElse(internalApiKey))
                         .build())
                 .retrieve()
                 .body(OpenWeatherResponse.class);
@@ -86,7 +88,7 @@ public class WeatherServiceImpl implements WeatherService {
                         .path("/geo/1.0/direct")
                         .queryParam("q", location)
                         .queryParam("limit", 1)
-                        .queryParam("appid", internalApiKey)
+                        .queryParam("appid", apiKey.orElse(internalApiKey))
                         .build())
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<GeocodeResponse>>() {
@@ -100,7 +102,7 @@ public class WeatherServiceImpl implements WeatherService {
                         .path("/data/2.5/air_pollution")
                         .queryParam("lat", lat)
                         .queryParam("lon", lon)
-                        .queryParam("appid", internalApiKey)
+                        .queryParam("appid", apiKey.orElse(internalApiKey))
                         .build())
                 .retrieve()
                 .body(AirPollutionResponse.class);
