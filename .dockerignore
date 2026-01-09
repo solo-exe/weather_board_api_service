@@ -1,0 +1,34 @@
+# 1. Secrets (CRITICAL)
+.env
+*.pem
+*.key
+**/.aws
+**/.ssh
+
+# 2. Version Control
+.git
+.gitignore
+.gitattributes
+
+# 3. Local Build Artifacts (Maven)
+local/
+target/
+*.jar
+*.war
+
+# 4. IDEs & Editors
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+*.swp
+
+# 5. OS Metadata
+.DS_Store
+Thumbs.db
+
+# 6. Logs & Temp Files
+*.log
+tmp/
