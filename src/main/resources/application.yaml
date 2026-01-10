@@ -28,3 +28,9 @@ server:
   # Global prefix for ALL routes in the application
   servlet:
     context-path: /api/v1
+
+logging:
+  level:
+    root: INFO
+    com.sollo_script.weather_board_api_service: DEBUG
+    org.springframework.web: DEBUG

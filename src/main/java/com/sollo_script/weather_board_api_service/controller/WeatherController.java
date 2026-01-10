@@ -17,7 +17,7 @@ import com.sollo_script.weather_board_api_service.dto.OpenWeatherResponse;
 import com.sollo_script.weather_board_api_service.service.WeatherService;
 
 @Controller
-@RequestMapping()
+@RequestMapping("/openweather")
 public class WeatherController {
 
     private final WeatherService weatherService;
