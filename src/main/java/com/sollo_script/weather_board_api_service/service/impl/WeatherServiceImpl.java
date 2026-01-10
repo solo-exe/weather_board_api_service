@@ -18,6 +18,8 @@ import com.sollo_script.weather_board_api_service.exception.error.TooManyRequest
 import com.sollo_script.weather_board_api_service.repository.DailyLogRepository;
 import com.sollo_script.weather_board_api_service.service.WeatherService;
 
+import tools.jackson.databind.ObjectMapper;
+
 @Service
 public class WeatherServiceImpl implements WeatherService {
 
@@ -74,13 +76,15 @@ public class WeatherServiceImpl implements WeatherService {
                         .queryParam("appid", apiKey.orElse(internalApiKey))
                         .build())
                 .retrieve()
-                .body(OpenWeatherResponse.class);
+                .body(String.class);
+
+        // System.out.println("DEBUG API RESPONSE: " + response);
 
         // Increment count only after successful call
         currentLog.setCallCount(currentCount + 1);
         dailyLogRepository.save(currentLog);
 
-        return response;
+        return new ObjectMapper().readValue(response, OpenWeatherResponse.class);
     }
 
     @Override
