@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sollo_script.weather_board_api_service.dto.AirPollutionResponse;
 import com.sollo_script.weather_board_api_service.dto.ApiResponse;
+import com.sollo_script.weather_board_api_service.exception.error.TooManyRequestsException;
+import jakarta.servlet.http.HttpServletRequest;
+import io.github.bucket4j.Bucket;
 import com.sollo_script.weather_board_api_service.dto.GeocodeResponse;
 import com.sollo_script.weather_board_api_service.dto.OpenWeatherResponse;
+import com.sollo_script.weather_board_api_service.service.RateLimitService;
 import com.sollo_script.weather_board_api_service.service.WeatherService;
 
 @Controller
@@ -21,9 +25,11 @@ import com.sollo_script.weather_board_api_service.service.WeatherService;
 public class WeatherController {
 
     private final WeatherService weatherService;
+    private final RateLimitService rateLimitService;
 
-    public WeatherController(WeatherService weatherService) {
+    public WeatherController(WeatherService weatherService, RateLimitService rateLimitService) {
         this.weatherService = weatherService;
+        this.rateLimitService = rateLimitService;
     }
 
     @GetMapping("/weather")
@@ -31,8 +37,14 @@ public class WeatherController {
     public ResponseEntity<ApiResponse<OpenWeatherResponse>> getWeather(
             @RequestParam double lat,
             @RequestParam double lon,
-            @RequestParam Optional<String> apiKey) {
-        return ResponseEntity.ok(ApiResponse.success(weatherService.getWeather(lat, lon, apiKey)));
+            @RequestParam Optional<String> apiKey,
+            HttpServletRequest request) {
+        Bucket bucket = rateLimitService.resolveBucket(request.getRemoteAddr());
+        if (bucket.tryConsume(1)) {
+            return ResponseEntity.ok(ApiResponse.success(weatherService.getWeather(lat, lon, apiKey)));
+        } else {
+            throw new TooManyRequestsException("Rate limit of 2 requests per second exceeded");
+        }
     }
 
     @GetMapping("/geocode")
