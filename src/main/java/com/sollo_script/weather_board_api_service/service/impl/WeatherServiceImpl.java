@@ -66,7 +66,7 @@ public class WeatherServiceImpl implements WeatherService {
         }
 
         // Synchronous call to external API
-        var response = restClient.get()
+        var openWeatherResponse = restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/data/3.0/onecall")
                         .queryParam("lat", lat)
@@ -80,11 +80,13 @@ public class WeatherServiceImpl implements WeatherService {
 
         // System.out.println("DEBUG API RESPONSE: " + response);
 
+        var response = new ObjectMapper().readValue(openWeatherResponse, OpenWeatherResponse.class);
+
         // Increment count only after successful call
         currentLog.setCallCount(currentCount + 1);
         dailyLogRepository.save(currentLog);
 
-        return new ObjectMapper().readValue(response, OpenWeatherResponse.class);
+        return response;
     }
 
     @Override
