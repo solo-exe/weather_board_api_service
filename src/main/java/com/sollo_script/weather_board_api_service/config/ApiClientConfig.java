@@ -10,12 +10,12 @@ import org.springframework.web.client.RestClient;
 public class ApiClientConfig {
 
     @Value("${openweathermap.api.base-url}")
-    private String openWeatherMapbaseUrl;
+    private String openWeatherMapBaseUrl;
 
     @Bean("openWeatherMap")
     public RestClient openWeatherClient() {
         return RestClient.builder()
-                .baseUrl(this.openWeatherMapbaseUrl)
+                .baseUrl(this.openWeatherMapBaseUrl)
                 .requestFactory(new SimpleClientHttpRequestFactory() {
                     {
                         setConnectTimeout(5000);

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -71,7 +72,7 @@ public class WeatherServiceImpl implements WeatherService {
                         .path("/data/3.0/onecall")
                         .queryParam("lat", lat)
                         .queryParam("lon", lon)
-                        .queryParam("units", "imperial")
+                        .queryParam("units", "metric")
                         .queryParam("exclude", "minutely,alerts")
                         .queryParam("appid", apiKey.orElse(internalApiKey))
                         .build())
@@ -99,12 +100,12 @@ public class WeatherServiceImpl implements WeatherService {
                         .queryParam("appid", apiKey.orElse(internalApiKey))
                         .build())
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<GeocodeResponse>>() {
+                .body(new ParameterizedTypeReference<@NonNull List<GeocodeResponse>>() {
                 });
     }
 
     @Override
-    public AirPollutionResponse getAirPollution(double lat, double lon, Optional<String> apiKey) {
+    public AirPollutionResponse getAirPollution(double lat, double lon, Optional<String> apiKey){
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/data/2.5/air_pollution")
