@@ -17,7 +17,7 @@ public interface WeatherService {
     /**
      * Fetches geocoding data for a location name.
      */
-    List<GeocodeResponse> getGeocode(String location, Optional<String> apiKey);
+    List<GeocodeResponse> getGeocode(String location, Integer limit, Optional<String> apiKey);
 
     /**
      * Fetches air pollution data for a specific location.

@@ -59,11 +59,14 @@ public class WeatherServiceImpl implements WeatherService {
         var currentLog = this.fetchDayLog();
         var currentCount = currentLog.getCallCount();
 
-        if (!apiKey.isPresent() || apiKey.get().equals(internalApiKey)) {
+        if (apiKey.isEmpty() || apiKey.get().equals(internalApiKey)) {
             // Limit to 900 calls per day as requested
             if (currentCount >= 900) {
                 throw new TooManyRequestsException("Daily API limit exceeded");
             }
+
+            currentLog.setCallCount(currentCount + 1);
+            dailyLogRepository.save(currentLog);
         }
 
         // Synchronous call to external API
@@ -79,33 +82,31 @@ public class WeatherServiceImpl implements WeatherService {
                 .retrieve()
                 .body(String.class);
 
-        // System.out.println("DEBUG API RESPONSE: " + response);
-
-        var response = new ObjectMapper().readValue(openWeatherResponse, OpenWeatherResponse.class);
-
-        // Increment count only after successful call
-        currentLog.setCallCount(currentCount + 1);
-        dailyLogRepository.save(currentLog);
-
-        return response;
+        return new ObjectMapper().readValue(openWeatherResponse, OpenWeatherResponse.class);
     }
 
     @Override
-    public List<GeocodeResponse> getGeocode(String location, Optional<String> apiKey) {
-        return restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/geo/1.0/direct")
-                        .queryParam("q", location)
-                        .queryParam("limit", 1)
-                        .queryParam("appid", apiKey.orElse(internalApiKey))
-                        .build())
+    public List<GeocodeResponse> getGeocode(String location, Integer limit, Optional<String> apiKey) {
+        System.out.println("Requesting Geocode for: " + location);
+        var geoCodeResponse = restClient.get()
+                .uri(uriBuilder -> {
+                    var finalUri = uriBuilder
+                            .path("/geo/1.0/direct")
+                            .queryParam("q", location)
+                            .queryParam("limit", limit)
+                            .queryParam("appid", apiKey.orElse(internalApiKey))
+                            .build();
+                    System.out.println("Calling URI: " + finalUri);
+                    return finalUri;
+                })
                 .retrieve()
                 .body(new ParameterizedTypeReference<@NonNull List<GeocodeResponse>>() {
                 });
+        return geoCodeResponse;
     }
 
     @Override
-    public AirPollutionResponse getAirPollution(double lat, double lon, Optional<String> apiKey){
+    public AirPollutionResponse getAirPollution(double lat, double lon, Optional<String> apiKey) {
         return restClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/data/2.5/air_pollution")

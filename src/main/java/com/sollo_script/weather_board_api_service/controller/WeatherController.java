@@ -3,6 +3,7 @@ package com.sollo_script.weather_board_api_service.controller;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,8 +52,9 @@ public class WeatherController {
     @ResponseBody
     public ResponseEntity<ApiResponse<List<GeocodeResponse>>> getGeocode(
             @RequestParam String location,
+            @RequestParam Integer limit,
             @RequestParam Optional<String> apiKey) {
-        return ResponseEntity.ok(ApiResponse.success(weatherService.getGeocode(location, apiKey)));
+        return ResponseEntity.ok(ApiResponse.success(weatherService.getGeocode(location, limit, apiKey)));
     }
 
     @GetMapping("/air_pollution")
