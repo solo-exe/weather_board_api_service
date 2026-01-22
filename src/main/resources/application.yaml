@@ -8,6 +8,7 @@ spring:
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -19,7 +20,6 @@ spring:
 
 openweathermap:
   api:
-    base-url: ${OPENWEATHERMAP_BASE_URL}
     apikey: ${OPENWEATHERMAP_API_KEY}
 
 server:

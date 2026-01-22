@@ -23,4 +23,10 @@ public interface WeatherService {
      * Fetches air pollution data for a specific location.
      */
     AirPollutionResponse getAirPollution(double lat, double lon, Optional<String> apiKey);
+
+    /**
+     * Fetches map layer tile image for a specific map type and tile coordinates.
+     * Returns the image as a byte array.
+     */
+    byte[] getMapLayerImage(String mapType, int z, int x, int y, Optional<String> apiKey);
 }

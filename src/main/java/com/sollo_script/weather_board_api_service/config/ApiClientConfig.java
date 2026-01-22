@@ -9,13 +9,10 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ApiClientConfig {
 
-    @Value("${openweathermap.api.base-url}")
-    private String openWeatherMapBaseUrl;
-
     @Bean("openWeatherMap")
     public RestClient openWeatherClient() {
         return RestClient.builder()
-                .baseUrl(this.openWeatherMapBaseUrl)
+                .baseUrl("https://api.openweathermap.org")
                 .requestFactory(new SimpleClientHttpRequestFactory() {
                     {
                         setConnectTimeout(5000);
@@ -23,5 +20,24 @@ public class ApiClientConfig {
                     }
                 })
                 .build();
+    }
+
+    @Bean("openWeatherMapTile")
+    public RestClient openWeatherMapTileClient() {
+        return RestClient.builder()
+                .baseUrl("https://tile.openweathermap.org/map")
+                .requestFactory(new SimpleClientHttpRequestFactory() {
+                    {
+                        setConnectTimeout(5000);
+                        setReadTimeout(5000);
+                    }
+                })
+                .build();
+    }
+
+    @Bean
+    @org.springframework.context.annotation.Scope("prototype")
+    public RestClient.Builder restClientBuilder() {
+        return RestClient.builder();
     }
 }

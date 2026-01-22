@@ -3,10 +3,11 @@ package com.sollo_script.weather_board_api_service.controller;
 import java.util.List;
 import java.util.Optional;
 
-import lombok.NonNull;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -64,5 +65,22 @@ public class WeatherController {
             @RequestParam double lon,
             @RequestParam Optional<String> apiKey) {
         return ResponseEntity.ok(ApiResponse.success(weatherService.getAirPollution(lat, lon, apiKey)));
+    }
+
+    @GetMapping(value = "/map_layer/{mapType}/{z}/{x}/{y}", produces = "image/png")
+    @ResponseBody
+    public ResponseEntity<byte[]> getMapLayer(
+            @PathVariable String mapType,
+            @PathVariable int z,
+            @PathVariable int x,
+            @PathVariable int y,
+            @RequestParam Optional<String> apiKey) {
+
+        byte[] imageBytes = weatherService.getMapLayerImage(mapType, z, x, y, apiKey);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_PNG)
+                .contentLength(imageBytes.length)
+                .body(imageBytes);
     }
 }

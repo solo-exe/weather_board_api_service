@@ -29,13 +29,16 @@ public class WeatherServiceImpl implements WeatherService {
 
     private final DailyLogRepository dailyLogRepository;
 
-    private final RestClient restClient;
+    private final RestClient openWeatherRestClient;
+    private final RestClient openWeatherTileRestClient;
 
     public WeatherServiceImpl(
             DailyLogRepository apiLogRepository,
-            @Qualifier("openWeatherMap") RestClient openWeatherClient) {
+            @Qualifier("openWeatherMap") RestClient openWeatherClient,
+            @Qualifier("openWeatherMapTile") RestClient openWeatherMapTileClient) {
         this.dailyLogRepository = apiLogRepository;
-        this.restClient = openWeatherClient;
+        this.openWeatherRestClient = openWeatherClient;
+        this.openWeatherTileRestClient = openWeatherMapTileClient;
     }
 
     private DailyLog fetchDayLog() {
@@ -69,16 +72,32 @@ public class WeatherServiceImpl implements WeatherService {
             dailyLogRepository.save(currentLog);
         }
 
+        // var openWeatherResponse = restClient.get()
+        // .uri(uriBuilder -> uriBuilder
+        // .path("/data/3.0/onecall")
+        // .queryParam("lat", lat)
+        // .queryParam("lon", lon)
+        // .queryParam("units", "metric")
+        // .queryParam("exclude", "minutely,alerts")
+        // .queryParam("appid", apiKey.orElse(internalApiKey))
+        // .build())
+        // .retrieve()
+        // .body(String.class);
+
         // Synchronous call to external API
-        var openWeatherResponse = restClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/data/3.0/onecall")
-                        .queryParam("lat", lat)
-                        .queryParam("lon", lon)
-                        .queryParam("units", "metric")
-                        .queryParam("exclude", "minutely,alerts")
-                        .queryParam("appid", apiKey.orElse(internalApiKey))
-                        .build())
+        var openWeatherResponse = openWeatherRestClient.get()
+                .uri(uriBuilder -> {
+                    var finalUri = uriBuilder
+                            .path("/data/3.0/onecall")
+                            .queryParam("lat", lat)
+                            .queryParam("lon", lon)
+                            .queryParam("units", "metric")
+                            .queryParam("exclude", "minutely,alerts")
+                            .queryParam("appid", apiKey.orElse(internalApiKey))
+                            .build();
+                    // System.out.println("Calling URI: " + finalUri);
+                    return finalUri;
+                })
                 .retrieve()
                 .body(String.class);
 
@@ -88,7 +107,7 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public List<GeocodeResponse> getGeocode(String location, Integer limit, Optional<String> apiKey) {
         System.out.println("Requesting Geocode for: " + location);
-        var geoCodeResponse = restClient.get()
+        var geoCodeResponse = openWeatherRestClient.get()
                 .uri(uriBuilder -> {
                     var finalUri = uriBuilder
                             .path("/geo/1.0/direct")
@@ -107,7 +126,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public AirPollutionResponse getAirPollution(double lat, double lon, Optional<String> apiKey) {
-        return restClient.get()
+        return openWeatherRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/data/2.5/air_pollution")
                         .queryParam("lat", lat)
@@ -116,5 +135,29 @@ public class WeatherServiceImpl implements WeatherService {
                         .build())
                 .retrieve()
                 .body(AirPollutionResponse.class);
+    }
+
+    @Override
+    public byte[] getMapLayerImage(String mapType, int z, int x, int y, Optional<String> apiKey) {
+
+        System.out.println(z);
+        System.out.println(x);
+        System.out.println(y);
+        System.out.println(mapType);
+        System.out.println(apiKey);
+
+        var imageBytes = openWeatherTileRestClient.get()
+                .uri(uriBuilder -> {
+                    var finalUri = uriBuilder
+                            .path("/{mapType}/{z}/{x}/{y}.png")
+                            .queryParam("appid", apiKey.orElse(internalApiKey))
+                            .build(mapType, z, x, y);
+                    System.out.println("Calling Tile URI: " + finalUri);
+                    return finalUri;
+                })
+                .retrieve()
+                .body(byte[].class);
+
+        return imageBytes;
     }
 }

@@ -38,9 +38,10 @@ public class MultipleClientConfigSample {
     // time someone asks." This prevents different parts of server app from
     // accidentally sharing the same builder and overwriting each other's Base URLs
     // or headers.
-    @Bean
-    @org.springframework.context.annotation.Scope("prototype")
-    public RestClient.Builder restClientBuilder() {
-        return RestClient.builder();
-    }
+
+    // @Bean
+    // @org.springframework.context.annotation.Scope("prototype")
+    // public RestClient.Builder restClientBuilder() {
+    // return RestClient.builder();
+    // }
 }
