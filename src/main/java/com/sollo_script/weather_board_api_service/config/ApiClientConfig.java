@@ -15,8 +15,8 @@ public class ApiClientConfig {
                 .baseUrl("https://api.openweathermap.org")
                 .requestFactory(new SimpleClientHttpRequestFactory() {
                     {
-                        setConnectTimeout(5000);
-                        setReadTimeout(5000);
+                        setConnectTimeout(10000);
+                        setReadTimeout(10000);
                     }
                 })
                 .build();
@@ -28,8 +28,8 @@ public class ApiClientConfig {
                 .baseUrl("https://tile.openweathermap.org/map")
                 .requestFactory(new SimpleClientHttpRequestFactory() {
                     {
-                        setConnectTimeout(5000);
-                        setReadTimeout(5000);
+                        setConnectTimeout(10000);
+                        setReadTimeout(10000);
                     }
                 })
                 .build();

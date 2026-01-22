@@ -140,11 +140,7 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public byte[] getMapLayerImage(String mapType, int z, int x, int y, Optional<String> apiKey) {
 
-        System.out.println(z);
-        System.out.println(x);
-        System.out.println(y);
-        System.out.println(mapType);
-        System.out.println(apiKey);
+        System.out.println(">>>>>>>>>>>>>>" + apiKey);
 
         var imageBytes = openWeatherTileRestClient.get()
                 .uri(uriBuilder -> {
