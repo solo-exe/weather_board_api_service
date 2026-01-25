@@ -9,6 +9,12 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     # password: ${DB_PASSWORD}
+  
+  # cache:
+  #   type: caffeine
+  #   cache-names: mapTiles
+  #   caffeine:
+  #     spec: maximumSize=1000,expireAfterWrite=7d,recordStats
 
   jpa:
     hibernate:

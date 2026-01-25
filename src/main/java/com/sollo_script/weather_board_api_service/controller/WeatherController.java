@@ -2,7 +2,10 @@ package com.sollo_script.weather_board_api_service.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -69,6 +72,7 @@ public class WeatherController {
 
     @GetMapping(value = "/map_layer/{mapType}/{z}/{x}/{y}", produces = "image/png")
     @ResponseBody
+    @Cacheable(value = "mapTiles", key = "#mapType + '_' + #z + '_' + #x + '_' + #y")
     public ResponseEntity<byte[]> getMapLayer(
             @PathVariable String mapType,
             @PathVariable int z,
@@ -78,8 +82,11 @@ public class WeatherController {
 
         byte[] imageBytes = weatherService.getMapLayerImage(mapType, z, x, y, apiKey);
 
+        System.out.println("WeatherController.getMapLayer() - Tile: " + mapType + "/" + z + "/" + x + "/" + y);
+
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
+                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS))
                 .contentLength(imageBytes.length)
                 .body(imageBytes);
     }
