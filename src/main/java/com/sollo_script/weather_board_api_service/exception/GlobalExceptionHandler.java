@@ -1,6 +1,8 @@
 package com.sollo_script.weather_board_api_service.exception;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,6 +18,18 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+        /**
+         * Creates HTTP headers with Content-Type set to application/json.
+         * This ensures error responses are always returned as JSON,
+         * even when the original request expected a different content type (e.g.,
+         * image/png).
+         */
+        private HttpHeaders createJsonHeaders() {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                return headers;
+        }
+
         // Handle Specific Exceptions (BaseException and its subclasses)
         @ExceptionHandler(BaseException.class)
         public ResponseEntity<ApiResponse<ErrorDetails>> handleBaseException(
@@ -27,7 +41,9 @@ public class GlobalExceptionHandler {
                                 webRequest.getDescription(false),
                                 exception.getErrorCode());
 
-                return new ResponseEntity<>(ApiResponse.error(exception.getStatus().value(), errorDetails),
+                return new ResponseEntity<>(
+                                ApiResponse.error(exception.getStatus().value(), errorDetails),
+                                createJsonHeaders(),
                                 exception.getStatus());
         }
 
@@ -49,7 +65,9 @@ public class GlobalExceptionHandler {
                                 webRequest.getDescription(false),
                                 "VALIDATION_ERROR");
 
-                return new ResponseEntity<>(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), errorDetails),
+                return new ResponseEntity<>(
+                                ApiResponse.error(HttpStatus.BAD_REQUEST.value(), errorDetails),
+                                createJsonHeaders(),
                                 HttpStatus.BAD_REQUEST);
         }
 
@@ -63,7 +81,10 @@ public class GlobalExceptionHandler {
                                 exception.getMessage(),
                                 webRequest.getDescription(false),
                                 "INTERNAL_SERVER_ERROR");
-                return new ResponseEntity<>(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorDetails),
+
+                return new ResponseEntity<>(
+                                ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorDetails),
+                                createJsonHeaders(),
                                 HttpStatus.INTERNAL_SERVER_ERROR);
         }
 }
