@@ -5,24 +5,25 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    # password: ${DB_PASSWORD}
+  # datasource:
+  #   url: ${DB_URL}
+  #   username: ${DB_USERNAME}
+  #   password: ${DB_PASSWORD}
   
+  # Removed because a cache config class was created
   # cache:
   #   type: caffeine
   #   cache-names: mapTiles
   #   caffeine:
   #     spec: maximumSize=1000,expireAfterWrite=7d,recordStats
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    # show-sql: true
-    # properties:
-    #   hibernate:
-    #     format_sql: true
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: update
+  #   show-sql: true
+  #   properties:
+  #     hibernate:
+  #       format_sql: true
 
 openweathermap:
   api:

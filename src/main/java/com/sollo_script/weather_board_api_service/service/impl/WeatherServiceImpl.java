@@ -16,7 +16,17 @@ import com.sollo_script.weather_board_api_service.dto.GeocodeResponse;
 import com.sollo_script.weather_board_api_service.dto.OpenWeatherResponse;
 import com.sollo_script.weather_board_api_service.entity.DailyLog;
 import com.sollo_script.weather_board_api_service.exception.error.TooManyRequestsException;
-import com.sollo_script.weather_board_api_service.repository.DailyLogRepository;
+
+// ===========================================
+// MYSQL/JPA IMPORT - COMMENTED OUT
+// ===========================================
+// import com.sollo_script.weather_board_api_service.repository.DailyLogRepository;
+
+// ===========================================
+// JSON FILE STORAGE - ACTIVE
+// ===========================================
+import com.sollo_script.weather_board_api_service.repository.JsonDailyLogRepository;
+
 import com.sollo_script.weather_board_api_service.service.WeatherService;
 
 import tools.jackson.databind.ObjectMapper;
@@ -27,13 +37,14 @@ public class WeatherServiceImpl implements WeatherService {
     @Value("${openweathermap.api.apikey}")
     private String internalApiKey;
 
-    private final DailyLogRepository dailyLogRepository;
+    private final JsonDailyLogRepository dailyLogRepository;
 
     private final RestClient openWeatherRestClient;
     private final RestClient openWeatherTileRestClient;
 
     public WeatherServiceImpl(
-            DailyLogRepository apiLogRepository,
+            JsonDailyLogRepository apiLogRepository,
+
             @Qualifier("openWeatherMap") RestClient openWeatherClient,
             @Qualifier("openWeatherMapTile") RestClient openWeatherMapTileClient) {
         this.dailyLogRepository = apiLogRepository;
@@ -42,7 +53,6 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private DailyLog fetchDayLog() {
-        // Using Java 10+ var for checking local variable type inference
         var today = LocalDate.now();
         var apiName = "OpenWeather";
 
@@ -71,18 +81,6 @@ public class WeatherServiceImpl implements WeatherService {
             currentLog.setCallCount(currentCount + 1);
             dailyLogRepository.save(currentLog);
         }
-
-        // var openWeatherResponse = restClient.get()
-        // .uri(uriBuilder -> uriBuilder
-        // .path("/data/3.0/onecall")
-        // .queryParam("lat", lat)
-        // .queryParam("lon", lon)
-        // .queryParam("units", "metric")
-        // .queryParam("exclude", "minutely,alerts")
-        // .queryParam("appid", apiKey.orElse(internalApiKey))
-        // .build())
-        // .retrieve()
-        // .body(String.class);
 
         // Synchronous call to external API
         var openWeatherResponse = openWeatherRestClient.get()
