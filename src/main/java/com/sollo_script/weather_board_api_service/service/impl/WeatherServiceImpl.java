@@ -93,7 +93,7 @@ public class WeatherServiceImpl implements WeatherService {
                             .queryParam("exclude", "minutely,alerts")
                             .queryParam("appid", apiKey.orElse(internalApiKey))
                             .build();
-                    // System.out.println("Calling URI: " + finalUri);
+                     System.out.println("Calling URI: " + finalUri);
                     return finalUri;
                 })
                 .retrieve()
@@ -105,7 +105,7 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public List<GeocodeResponse> getGeocode(String location, Integer limit, Optional<String> apiKey) {
         System.out.println("Requesting Geocode for: " + location);
-        var geoCodeResponse = openWeatherRestClient.get()
+        return openWeatherRestClient.get()
                 .uri(uriBuilder -> {
                     var finalUri = uriBuilder
                             .path("/geo/1.0/direct")
@@ -119,7 +119,6 @@ public class WeatherServiceImpl implements WeatherService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<@NonNull List<GeocodeResponse>>() {
                 });
-        return geoCodeResponse;
     }
 
     @Override
@@ -137,7 +136,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public byte[] getMapLayerImage(String mapType, int z, int x, int y, Optional<String> apiKey) {
-        var imageBytes = openWeatherTileRestClient.get()
+        return openWeatherTileRestClient.get()
                 .uri(uriBuilder -> {
                     var finalUri = uriBuilder
                             .path("/{mapType}/{z}/{x}/{y}.png")
@@ -148,7 +147,5 @@ public class WeatherServiceImpl implements WeatherService {
                 })
                 .retrieve()
                 .body(byte[].class);
-
-        return imageBytes;
     }
 }
